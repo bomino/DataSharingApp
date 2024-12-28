@@ -1,0 +1,197 @@
+{% extends 'data_manager/base.html' %}
+{% load static %}
+
+{% block title %}
+  Home | Data Collection Manager
+{% endblock %}
+
+{% block content %}
+  <!-- Welcome Section -->
+  <div class="card p-5">
+    <div class="text-center">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" class="mb-4" style="height: 80px;" />
+      <h1 class="display-5 fw-bold mb-4">Welcome to Data Collection Manager</h1>
+      {% if user.is_authenticated %}
+        <p class="lead mb-4">Hello, {{ user.username }}! Start managing your data efficiently and securely.</p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+          <a href="{% url 'upload' %}" class="btn btn-primary"><i class="bi bi-cloud-upload me-2"></i>Upload Data</a>
+          <a href="{% url 'file_list' %}" class="btn btn-outline-secondary"><i class="bi bi-files me-2"></i>View Files</a>
+          <a href="{% url 'shared_files' %}" class="btn btn-outline-primary"><i class="bi bi-share me-2"></i>Shared Files</a>
+        </div>
+      {% else %}
+        <p class="lead mb-4">Please log in to start managing your data.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary"><i class="bi bi-box-arrow-in-right me-2"></i>Login</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if user.is_authenticated %}
+    <!-- Process Flow Guide -->
+    <div class="card p-4 mt-4 shadow-sm">
+      <h2 class="fw-bold mb-3">Quick Guide</h2>
+      <div class="row">
+        <!-- Upload Guide - Show to all authenticated users -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title text-primary"><i class="bi bi-upload me-2"></i>How to Upload Files</h4>
+              <ol class="mt-3">
+                <li class="mb-2">
+                  Click on <span class="badge bg-primary">Upload Data</span> button
+                </li>
+                <li class="mb-2">Select your file (supported formats: CSV, XLSX, XLS)</li>
+                <li class="mb-2">File must include columns: date, value, category</li>
+                <li class="mb-2">Maximum file size: 10MB</li>
+                <li>System will automatically validate your file</li>
+              </ol>
+              <div class="mt-3">
+                <a href="{% url 'upload' %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-upload me-1"></i>Start Uploading</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title text-primary"><i class="bi bi-share me-2"></i>How to Share Files</h4>
+              <ol class="mt-3">
+                <li class="mb-2">
+                  Navigate to <span class="badge bg-primary">Shared Files</span> section
+                </li>
+                <li class="mb-2">Click "Share File" button</li>
+                <li class="mb-2">Select the file and recipient</li>
+                <li class="mb-2">Shared files automatically expire after 7 days</li>
+                <li>Recipients can download shared files</li>
+              </ol>
+              <div class="mt-3">
+                <a href="{% url 'shared_files' %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-share me-1"></i>Share Files</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pro Tips - Only for admin and analyst -->
+        {% if user.is_superuser or user.role == 'analyst' %}
+          <div class="col-12">
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+              <i class="bi bi-info-circle-fill me-2"></i>
+              <div>
+                <strong>Pro Tip:</strong> Keep your shared files organized by regularly checking the expiration dates and managing access permissions.
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div class="card p-4 mt-4 shadow-sm">
+      <h2 class="fw-bold mb-3">Your Dashboard</h2>
+      <p class="text-muted mb-4">Overview of your data management activities and platform features.</p>
+
+      <!-- File Statistics Section -->
+      <h5 class="text-muted mb-3">File Management</h5>
+      <div class="row mb-4">
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-primary fw-bold"><i class="bi bi-folder-fill me-2"></i>{{ total_files }}</h2>
+              <p class="card-text text-muted">Total Files</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-success fw-bold"><i class="bi bi-check-circle-fill me-2"></i>{{ validation_stats.valid }}</h2>
+              <p class="card-text text-muted">Validated Files</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-warning fw-bold"><i class="bi bi-exclamation-circle-fill me-2"></i>{{ validation_stats.pending }}</h2>
+              <p class="card-text text-muted">Pending Validation</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-info fw-bold"><i class="bi bi-clock-history me-2"></i>{{ recent_uploads }}</h2>
+              <p class="card-text text-muted">Recent Uploads (7d)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sharing Statistics Section -->
+      <h5 class="text-muted mb-3">File Sharing</h5>
+      <div class="row mb-5">
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-primary fw-bold"><i class="bi bi-share me-2"></i>{{ sharing_stats.shared_by_me }}</h2>
+              <p class="card-text text-muted">Active Shares</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-success fw-bold"><i class="bi bi-box-arrow-in-down me-2"></i>{{ sharing_stats.shared_with_me }}</h2>
+              <p class="card-text text-muted">Shared with Me</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-warning fw-bold"><i class="bi bi-alarm me-2"></i>{{ sharing_stats.expiring_soon }}</h2>
+              <p class="card-text text-muted">Expiring Soon (48h)</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <h2 class="card-title text-info fw-bold"><i class="bi bi-arrow-repeat me-2"></i>{{ sharing_stats.recent_shares }}</h2>
+              <p class="card-text text-muted">Recent Shares (7d)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <h5 class="text-muted mb-3">Platform Features</h5>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 feature-card shadow-sm">
+            <div class="card-body">
+              <h3 class="card-title"><i class="bi bi-shield-check text-success me-2"></i>Security</h3>
+              <p class="card-text">Enterprise-grade security for your data.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 feature-card shadow-sm">
+            <div class="card-body">
+              <h3 class="card-title"><i class="bi bi-graph-up text-primary me-2"></i>Analytics</h3>
+              <p class="card-text">Advanced tools to gain insights from your data.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 feature-card shadow-sm">
+            <div class="card-body">
+              <h3 class="card-title"><i class="bi bi-people text-warning me-2"></i>Collaboration</h3>
+              <p class="card-text">Role-based access for seamless teamwork.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
