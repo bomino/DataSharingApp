@@ -137,8 +137,14 @@ data_collection_project/
 
 ## License
 
-[Your License Information]
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-[Contact Information or Support Instructions]
+If you encounter any issues or have questions about the project, please feel free to reach out:
+
+- **Email**: [mlawali@versatexmsp.com]
+- **GitHub Issues**: [Link to Issues Page](https://github.com/bomino/DataSharingApp/issues)
+- **Documentation**: [Link to Documentation](https://github.com/bomino/DataSharingApp/blob/main/Documentation.md)
+
+For urgent matters or inquiries related to contributing, please contact the maintainer directly via email.
