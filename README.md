@@ -143,7 +143,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 If you encounter any issues or have questions about the project, please feel free to reach out:
 
-- **Email**: [mlawali@versatexmsp.com]
+- **Email**: [mlawali@qidaya.com]
 - **GitHub Issues**: [Link to Issues Page](https://github.com/bomino/DataSharingApp/issues)
 - **Documentation**: [Link to Documentation](https://github.com/bomino/DataSharingApp/blob/main/Documentation.md)
 
